@@ -8,10 +8,18 @@
     }
 
     .headerLinks {
-        @apply hidden md:inline-flex cursor-pointer hover:text-gray-400;
+        @apply hidden md:inline-flex text-gray-400 cursor-pointer hover:text-gray-200;
     }
 
     .link {
-        @apply hover:text-blue-500 hover:underline cursor-pointer text-gray-300;
+        @apply hover:text-purple-500 hover:underline cursor-pointer text-gray-300;
+    }
+
+    .filterLinks {
+        @apply px-3 rounded-md bg-white/20 border border-transparent hover:border-white cursor-pointer;
+    }
+
+    .card {
+        @apply border border-gray-700 rounded-md p-5 bg-gradient-to-br from-purple-900/40 to-gray-900;
     }
 }
