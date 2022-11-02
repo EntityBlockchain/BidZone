@@ -4,7 +4,7 @@
 
 @layer components {
     .connectWalletButton {
-        @apply px-2 py-1 rounded-md bg-gradient-to-br from-purple-900 to-blue-900 text-sm hover:from-blue-900 hover:to-purple-900 duration-500;
+        @apply px-2 py-1 rounded-md bg-gradient-to-br from-purple-900 to-blue-900 text-sm hover:from-blue-900 hover:to-purple-900 duration-500 border border-transparent hover:border-white;
     }
 
     .headerLinks {
@@ -21,5 +21,9 @@
 
     .card {
         @apply border border-gray-700 rounded-md p-5 bg-gradient-to-br from-purple-900/40 to-gray-900;
+    }
+
+    .formField {
+        @apply border-2 border-gray-300 bg-white h-10 px-5 pr-16 rounded-lg text-sm outline-none text-black;
     }
 }
