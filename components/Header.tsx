@@ -37,8 +37,8 @@ const Header = () => {
                     <p className="headerLinks">Sell</p>
                     <p className="headerLinks">Watchlist</p>
 
-                    <Link className="link font-bold" href="/addItem">
-                        List Item
+                    <Link className="link font-bold" href="/mint">
+                        Mint Item
                     </Link>
                     <AiOutlineBell className="h-6 w-6" />
                     <BsCart2 className="h-6 w-6" />

@@ -11,11 +11,14 @@ import {
     useCreateDirectListing,
 } from "@thirdweb-dev/react";
 import { useRouter } from "next/router";
-import { NFT } from "@thirdweb-dev/sdk";
+import { NFT, NATIVE_TOKENS, NATIVE_TOKEN_ADDRESS } from "@thirdweb-dev/sdk";
+import network from "../utils/network";
+import { AiOutlineConsoleSql } from "react-icons/ai";
 
 const Create = () => {
     const [selectedNFT, setSelectedNFT] = useState<NFT>();
     const address = useAddress();
+    const router = useRouter();
     const { contract } = useContract(
         process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT,
         "marketplace"
@@ -25,6 +28,86 @@ const Create = () => {
         "nft-collection"
     );
     const ownedNFTs = useOwnedNFTs(collectionContract, address);
+
+    const networkMismatch = useNetworkMismatch();
+
+    const [, switchNetwork] = useNetwork();
+
+    const {
+        mutate: createDirectListing,
+        isLoading,
+        error,
+    } = useCreateDirectListing(contract);
+    const {
+        mutate: createAuctionListing,
+        isLoading: isLoadingAuction,
+        error: errorAuction,
+    } = useCreateAuctionListing(contract);
+
+    const createListing = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (networkMismatch) {
+            switchNetwork && switchNetwork(network);
+            return;
+        }
+        if (!selectedNFT) return;
+        const target = e.target as typeof e.target & {
+            elements: {
+                listingType: { value: string };
+                price: { value: string };
+            };
+        };
+
+        const { listingType, price } = target.elements;
+        if (listingType.value === "directListing") {
+            createDirectListing(
+                {
+                    assetContractAddress:
+                        process.env.NEXT_PUBLIC_COLLECTION_CONTRACT!,
+                    tokenId: selectedNFT.metadata.id,
+                    currencyContractAddress: NATIVE_TOKEN_ADDRESS,
+                    listingDurationInSeconds: 60 * 60 * 24 * 7, // 1 Week
+                    quantity: 1,
+                    buyoutPricePerToken: price.value,
+                    startTimestamp: new Date(),
+                },
+                {
+                    onSuccess(data, variables, context) {
+                        console.log("Success: ", data, variables, context);
+                        router.push("/");
+                    },
+                    onError(error, variables, context) {
+                        console.log("Error: ", error, variables, context);
+                    },
+                }
+            );
+        }
+        if (listingType.value === "auctionListing") {
+            createAuctionListing(
+                {
+                    assetContractAddress:
+                        process.env.NEXT_PUBLIC_COLLECTION_CONTRACT!,
+                    tokenId: selectedNFT.metadata.id,
+                    currencyContractAddress: NATIVE_TOKEN_ADDRESS,
+                    listingDurationInSeconds: 60 * 60 * 24 * 7, // 1 Week
+                    quantity: 1,
+                    buyoutPricePerToken: price.value,
+                    startTimestamp: new Date(),
+                    reservePricePerToken: 0,
+                },
+                {
+                    onSuccess(data, variables, context) {
+                        console.log("Success: ", data, variables, context);
+                        router.push("/");
+                    },
+                    onError(error, variables, context) {
+                        console.log("Error: ", error, variables, context);
+                    },
+                }
+            );
+        }
+    };
+
     return (
         <div className="bg-black min-h-screen text-white">
             <Header />
@@ -38,10 +121,10 @@ const Create = () => {
                     All of your NFT's that are available to be sold will be
                     shown below.
                 </p>
-                <div className="flex overflow-x-scroll space-x-2 p-4">
+                <div className="flex overflow-x-scroll space-x-2 p-4 scrollbar-thin scrollbar-track-white scrollbar-thumb-purple-900">
                     {ownedNFTs?.data?.map((nft) => (
                         <div
-                            className={`flex flex-col card min-w-fit select-none ${
+                            className={`flex flex-col cursor-pointer card min-w-fit select-none ${
                                 nft.metadata.id === selectedNFT?.metadata.id
                                     ? "border-white shadow-white/50 shadow-lg duration-500"
                                     : "border-transparent"
@@ -63,7 +146,7 @@ const Create = () => {
                     ))}
                 </div>
                 {selectedNFT && (
-                    <form>
+                    <form onSubmit={createListing}>
                         <div className="flex flex-col p-10">
                             <div className="grid grid-cols-2 gap-5">
                                 <label className="border-r font-light">
@@ -84,7 +167,22 @@ const Create = () => {
                                     name="listingType"
                                     value="auctionListing"
                                 />
+                                <label className="border-r font-light">
+                                    Price
+                                </label>
+                                <input
+                                    className="text-black p-2"
+                                    type="text"
+                                    name="price"
+                                    placeholder="0.05"
+                                />
                             </div>
+                            <button
+                                type="submit"
+                                className="connectWalletButton mt-8 w-44 mx-auto"
+                            >
+                                Create Listing
+                            </button>
                         </div>
                     </form>
                 )}

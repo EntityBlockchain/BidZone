@@ -4,7 +4,7 @@ import { useAddress, useContract } from "@thirdweb-dev/react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
-const AddItem = () => {
+const Mint = () => {
     const [preview, setPreview] = useState<string>("");
     const [image, setImage] = useState<File>();
     const router = useRouter();
@@ -45,11 +45,12 @@ const AddItem = () => {
         <div className="bg-black min-h-screen text-white">
             <Header />
             <main className="max-w-6xl mx-auto p-10 border">
-                <h1 className="text-2xl font-bold">Create Item to List</h1>
+                <h1 className="text-2xl font-bold">Mint Item to List</h1>
                 <h2 className="text-lg font-semibold pt-5">Item Details</h2>
                 <p className="pb-5">
-                    Listing an item allows you mint an NFT of your item to your
-                    wallet where you can then list the NFT for sale.
+                    Minting an item allows you to create an item as an NFT that
+                    will be stored in your MetaMask wallet. Once the item is
+                    created, it can then be listed on the website.
                 </p>
                 <div className="flex flex-col justify-center items-center md:flex-row md:space-x-5 pt-10">
                     <Image
@@ -106,4 +107,4 @@ const AddItem = () => {
     );
 };
 
-export default AddItem;
+export default Mint;
