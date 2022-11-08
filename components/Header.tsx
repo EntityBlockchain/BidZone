@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAddress, useDisconnect, useMetamask } from "@thirdweb-dev/react";
 import Link from "next/link";
-import { AiOutlineBell, AiOutlineSearch } from "react-icons/ai";
-import { BsCart2 } from "react-icons/bs";
-import { BiChevronDown } from "react-icons/bi";
+import { AiOutlineSearch } from "react-icons/ai";
+import { MdOutlineCreateNewFolder, MdOutlineSell } from "react-icons/md";
 import Image from "next/image";
 
 const Header = () => {
+    const [searchQuery, setSearchQuery] = useState<string>("");
     const connect = useMetamask();
     const disconnect = useDisconnect();
     const address = useAddress();
@@ -18,7 +18,7 @@ const Header = () => {
                     {address ? (
                         <button
                             onClick={disconnect}
-                            className="connectWalletButton"
+                            className="connectWalletButton text-xs md:text-sm"
                         >
                             Connected:{" "}
                             {address.slice(0, 5) + "..." + address.slice(-4)}
@@ -40,8 +40,12 @@ const Header = () => {
                     <Link className="link font-bold" href="/mint">
                         Mint Item
                     </Link>
-                    <AiOutlineBell className="h-6 w-6" />
-                    <BsCart2 className="h-6 w-6" />
+                    <Link href="/create">
+                        <MdOutlineSell className="h-7 w-7 rounded-full p-[2px] shadow-purple-500/50 shadow-md hover:scale-90 duration-300 hover:shadow-purple-300 cursor-pointer" />
+                    </Link>
+                    <Link href="/mint">
+                        <MdOutlineCreateNewFolder className="h-7 w-7 rounded-full p-[2px] shadow-purple-500/50 shadow-md hover:scale-90 hover:shadow-purple-300 duration-300 cursor-pointer" />
+                    </Link>
                 </div>
             </nav>
             <hr className="mt-2" />
@@ -60,17 +64,13 @@ const Header = () => {
                         Auctions
                     </p>
                 </div>
-                <button className="hidden lg:flex flex-row items-center w-20 space-x-2">
-                    <p className="text-gray-300 text-sm">Categories</p>
-                    <BiChevronDown className="h-6 w-6 flex-shrink-0 pr-3" />
-                </button>
-
                 <div className="flex items-center space-x-2 px-2 md:px-5 py-2 flex-1 bg-white rounded-md">
                     <AiOutlineSearch className="text-gray-400 bg-white" />
                     <input
                         className="flex-1 outline-none text-black"
                         type="text"
                         placeholder="Search..."
+                        onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
 
@@ -85,13 +85,16 @@ const Header = () => {
                 </Link>
             </section>
             <hr />
-            <section className="flex py-3 space-x-6 text-xs md:text-sm whitespace-nowrap px-6 justify-center">
-                <p className="filterLinks">Home</p>
-                <p className="filterLinks">Tech</p>
-                <p className="filterLinks">Games</p>
-                <p className="filterLinks">NFT</p>
-                <p className="filterLinks">Music</p>
-                <p className="filterLinks">Other</p>
+            <section className="flex py-3 space-x-6 text-sm md:text-sm whitespace-nowrap px-6 justify-center">
+                <Link href="/">
+                    <p className="filterLinks">Home</p>
+                </Link>
+                <Link href="/mint">
+                    <p className="filterLinks">Mint</p>
+                </Link>
+                <Link href="/create">
+                    <p className="filterLinks">Sell</p>
+                </Link>
             </section>
         </div>
     );

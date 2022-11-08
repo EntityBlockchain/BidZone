@@ -3,6 +3,7 @@ import Header from "../components/Header";
 import { useAddress, useContract } from "@thirdweb-dev/react";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import toast from "react-hot-toast";
 
 const Mint = () => {
     const [preview, setPreview] = useState<string>("");
@@ -15,9 +16,13 @@ const Mint = () => {
     );
     const mintNFT = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!contract || !address) return;
+        const mintToast = toast.loading("Minting NFT...");
+        if (!contract || !address) {
+            toast.error("Please connect your wallet!", { id: mintToast });
+            return;
+        }
         if (!image) {
-            alert("Please Select an Image");
+            toast.error("Please select an Image", { id: mintToast });
             return;
         }
         const target = e.target as typeof e.target & {
@@ -29,25 +34,35 @@ const Mint = () => {
             description: target.description.value,
             image: image,
         };
+        if (!metadata.description || !metadata.name) {
+            toast.error(
+                "Error! Please Enter the Name of Item and Description",
+                { id: mintToast }
+            );
+            return;
+        }
         try {
             const tx = await contract.mintTo(address, metadata);
             const receipt = tx.receipt;
             const tokenId = tx.id;
             const nft = await tx.data();
-            console.log(receipt, tokenId, nft);
+            toast.success("Success! Your NFT is now minted.", {
+                id: mintToast,
+            });
             router.push("/");
         } catch (error) {
             console.error(error);
+            toast.error("Error! Please try again later.", { id: mintToast });
         }
     };
 
     return (
         <div className="bg-black min-h-screen text-white">
             <Header />
-            <main className="max-w-6xl mx-auto p-10 border">
+            <main className="max-w-6xl mx-auto p-10 border bg-gradient-to-br from-white/10 to-transparent rounded-md border-gray-500">
                 <h1 className="text-2xl font-bold">Mint Item to List</h1>
                 <h2 className="text-lg font-semibold pt-5">Item Details</h2>
-                <p className="pb-5">
+                <p className="pb-5 text-gray-300 text-sm">
                     Minting an item allows you to create an item as an NFT that
                     will be stored in your MetaMask wallet. Once the item is
                     created, it can then be listed on the website.

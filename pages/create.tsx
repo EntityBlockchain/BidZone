@@ -13,7 +13,6 @@ import {
 import { useRouter } from "next/router";
 import { NFT, NATIVE_TOKENS, NATIVE_TOKEN_ADDRESS } from "@thirdweb-dev/sdk";
 import network from "../utils/network";
-import { toNamespacedPath } from "node:path/win32";
 import toast from "react-hot-toast";
 
 const Create = () => {
@@ -47,8 +46,12 @@ const Create = () => {
 
     const createListing = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        const loadToast = toast.loading("Creating Listing...");
         if (networkMismatch) {
             switchNetwork && switchNetwork(network);
+            toast.error("Wrong Network Detected. Please Change to Mumbai.", {
+                id: loadToast,
+            });
             return;
         }
         if (!selectedNFT) {
@@ -62,6 +65,15 @@ const Create = () => {
             };
         };
 
+        if (!target.elements.listingType.value) {
+            toast.error("Please Pick a Listing Type.", { id: loadToast });
+            return;
+        }
+
+        if (!target.elements.price.value) {
+            toast.error("Please Enter a Selling Price.", { id: loadToast });
+            return;
+        }
         const { listingType, price } = target.elements;
         if (listingType.value === "directListing") {
             createDirectListing(
@@ -76,12 +88,19 @@ const Create = () => {
                     startTimestamp: new Date(),
                 },
                 {
-                    onSuccess(data, variables, context) {
-                        console.log("Success: ", data, variables, context);
+                    onSuccess() {
+                        toast.success(
+                            "Success! Your Direct Listing is now created.",
+                            { id: loadToast }
+                        );
                         router.push("/");
                     },
-                    onError(error, variables, context) {
-                        console.log("Error: ", error, variables, context);
+                    onError() {
+                        toast.error(
+                            "Error! Please check your inputs and try again..",
+                            { id: loadToast }
+                        );
+                        return;
                     },
                 }
             );
@@ -100,12 +119,19 @@ const Create = () => {
                     reservePricePerToken: 0,
                 },
                 {
-                    onSuccess(data, variables, context) {
-                        console.log("Success: ", data, variables, context);
+                    onSuccess() {
+                        toast.success(
+                            "Success! Your Auction Listing is now created.",
+                            { id: loadToast }
+                        );
                         router.push("/");
                     },
-                    onError(error, variables, context) {
-                        console.log("Error: ", error, variables, context);
+                    onError() {
+                        toast.error(
+                            "Error! Please check your inputs and try again..",
+                            { id: loadToast }
+                        );
+                        return;
                     },
                 }
             );
@@ -117,18 +143,20 @@ const Create = () => {
             <Header />
             <main className="max-w-6xl mx-auto p-10 pt-2">
                 <h1 className="text-2xl font-bold">List an Item</h1>
-                <h2 className="text-lg font-semibold pt-5">
-                    Select an item you would like to sell.
-                </h2>
                 <hr className="mb-5" />
-                <p className="text-sm">
-                    All of your NFT's that are available to be sold will be
-                    shown below.
+                <p className="text-sm text-gray-300">
+                    Connect your wallet and all of your available NFT's will
+                    display below:
                 </p>
                 <div className="flex overflow-x-scroll space-x-2 p-4 scrollbar-thin scrollbar-track-white scrollbar-thumb-purple-900">
+                    {!address && (
+                        <div className="text-red-500">
+                            Please connect your wallet to view your collection.
+                        </div>
+                    )}
                     {ownedNFTs?.data?.map((nft) => (
                         <div
-                            className={`flex flex-col cursor-pointer card min-w-fit select-none ${
+                            className={`flex flex-col cursor-pointer card min-w-fit select-none gap-y-3 ${
                                 nft.metadata.id === selectedNFT?.metadata.id
                                     ? "border-white shadow-white/50 shadow-lg duration-500"
                                     : "border-transparent"
@@ -149,33 +177,36 @@ const Create = () => {
                         </div>
                     ))}
                 </div>
+                <p className="text-xs text-center text-gray-300 mt-1">
+                    Click an NFT to show Listing Options.
+                </p>
                 {selectedNFT && (
                     <form onSubmit={createListing}>
-                        <div className="flex flex-col p-10">
+                        <div className="mt-5 border border-gray-500 rounded-md bg-gradient-to-br from-white/10 to-transparent flex flex-col p-10">
                             <div className="grid grid-cols-2 gap-5">
-                                <label className="border-r font-light">
-                                    Direct Listing (Fixed Price)
+                                <label className="flex items-center pr-10 border-r ml-auto font-light">
+                                    Direct Listing
                                 </label>
                                 <input
-                                    className="ml-auto h-7 w-7"
+                                    className="mr-auto h-7 w-7 cursor-pointer"
                                     type="radio"
                                     name="listingType"
                                     value="directListing"
                                 />
-                                <label className="border-r font-light">
+                                <label className="flex items-center pr-10 border-r ml-auto font-light">
                                     Auction
                                 </label>
                                 <input
-                                    className="ml-auto h-7 w-7"
+                                    className="mr-auto h-7 w-7 cursor-pointer"
                                     type="radio"
                                     name="listingType"
                                     value="auctionListing"
                                 />
-                                <label className="border-r font-light">
+                                <label className="flex items-center pr-10 border-r ml-auto font-light">
                                     Price
                                 </label>
                                 <input
-                                    className="text-black p-2"
+                                    className="text-black p-2 rounded-md max-w-xs"
                                     type="text"
                                     name="price"
                                     placeholder="0.05"
@@ -187,6 +218,9 @@ const Create = () => {
                             >
                                 Create Listing
                             </button>
+                            <p className="text-[11px] text-center text-gray-300 mt-3">
+                                Listing/Auction Duration = 1 Week
+                            </p>
                         </div>
                     </form>
                 )}
