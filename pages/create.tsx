@@ -13,7 +13,8 @@ import {
 import { useRouter } from "next/router";
 import { NFT, NATIVE_TOKENS, NATIVE_TOKEN_ADDRESS } from "@thirdweb-dev/sdk";
 import network from "../utils/network";
-import { AiOutlineConsoleSql } from "react-icons/ai";
+import { toNamespacedPath } from "node:path/win32";
+import toast from "react-hot-toast";
 
 const Create = () => {
     const [selectedNFT, setSelectedNFT] = useState<NFT>();
@@ -50,7 +51,10 @@ const Create = () => {
             switchNetwork && switchNetwork(network);
             return;
         }
-        if (!selectedNFT) return;
+        if (!selectedNFT) {
+            toast.error("Error: No NFT Selected");
+            return;
+        }
         const target = e.target as typeof e.target & {
             elements: {
                 listingType: { value: string };

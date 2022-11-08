@@ -34,9 +34,9 @@ const Header = () => {
                 </div>
                 <div className="flex items-center space-x-4 text-sm">
                     <p className="headerLinks">About</p>
-                    <p className="headerLinks">Sell</p>
-                    <p className="headerLinks">Watchlist</p>
-
+                    <Link href="/create">
+                        <p className="headerLinks">List Item</p>
+                    </Link>
                     <Link className="link font-bold" href="/mint">
                         Mint Item
                     </Link>

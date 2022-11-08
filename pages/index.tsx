@@ -39,7 +39,7 @@ const Home = () => {
                                 onClick={() =>
                                     router.push(`/listing/${listing.id}`)
                                 }
-                                className="flex flex-col card hover:scale-105 transition-all duration-300 ease-out h-full"
+                                className="flex flex-col card hover:scale-105 transition-all duration-300 ease-out h-full cursor-pointer hover:shadow-white/50 hover:shadow-md"
                                 key={listing.id}
                             >
                                 <div className="flex flex-1 flex-col pb-2 items-center">
