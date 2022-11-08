@@ -4,12 +4,23 @@ import Link from "next/link";
 import { AiOutlineSearch } from "react-icons/ai";
 import { MdOutlineCreateNewFolder, MdOutlineSell } from "react-icons/md";
 import Image from "next/image";
+import { useRouter } from "next/router";
 
 const Header = () => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const connect = useMetamask();
     const disconnect = useDisconnect();
     const address = useAddress();
+    const router = useRouter();
+
+    const fireQuery = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+        if (searchQuery !== "") {
+            router.push(`/search/${searchQuery}`);
+        } else {
+            return;
+        }
+    };
 
     return (
         <div className="max-w-6xl mx-auto p-2">
@@ -33,7 +44,9 @@ const Header = () => {
                     )}
                 </div>
                 <div className="flex items-center space-x-4 text-sm">
-                    <p className="headerLinks">About</p>
+                    <Link href="/about">
+                        <p className="headerLinks">About</p>
+                    </Link>
                     <Link href="/create">
                         <p className="headerLinks">List Item</p>
                     </Link>
@@ -74,7 +87,10 @@ const Header = () => {
                     />
                 </div>
 
-                <button className="rounded-md hidden sm:inline px-4 md:px-8 py-2 bg-white/20 hover:bg-white/30 duration-500">
+                <button
+                    onClick={fireQuery}
+                    className="rounded-md hidden sm:inline px-4 md:px-8 py-2 bg-white/20 hover:bg-white/30 duration-500"
+                >
                     Search
                 </button>
 
